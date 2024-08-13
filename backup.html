@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASCII Torus Renderer</title>
+    <style>
+        body1 {
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Para asegurarse de que el canvas ocupe todo el cuerpo */
+        }
+        canvas {
+            position: fixed; /* Fijar el canvas en la ventana */
+            top: 0;
+            left: 0;
+            z-index: -1; /* Colocar el canvas detrás de otros elementos */
+            opacity: 0.5; /* Establecer la opacidad */
+        }
+        /* Estilos para hacer el fondo negro y el texto verde */
+        body {
+            background-color: black;
+            color: white;
+        }
+        /* Estilos para centrar el contenido verticalmente en la parte superior */
+        .top-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 50vh; /* La mitad de la altura de la ventana */
+        }
+        /* Estilos para centrar el contenido horizontalmente */
+        .center-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 0vh; /* La otra mitad de la altura de la ventana */
+        }
+        .bottom-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50vh; /* La otra mitad de la altura de la ventana */
+        }
+        pre {
+            font-family: monospace;
+            font-size: 12px;
+            margin: 0; /* Eliminar el margen predeterminado del pre */
+        }
+        /* Estilos para centrar el arte ASCII */
+        .ascii-container {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canv" width="500" height="200"></canvas>
+    
+    <div class="top-container">
+        <pre>                                                                                                                                                                                                                                                 
+                                                                                                                                                                                                                                                          
+  YYYYYYY       YYYYYYY                                        OOOOOOOOO                                                                  DDDDDDDDDDDDD                                                                      tttt                           
+  Y:::::Y       Y:::::Y                                      OO:::::::::OO                                                                D::::::::::::DDD                                                                ttt:::t                           
+  Y:::::Y       Y:::::Y                                    OO:::::::::::::OO                                                              D:::::::::::::::DD                                                              t:::::t                           
+  Y::::::Y     Y::::::Y                                   O:::::::OOO:::::::O                                                             DDD:::::DDDDD:::::D                                                             t:::::t                           
+  YYY:::::Y   Y:::::YYY   ooooooooooo   uuuuuu    uuuuuu  O::::::O   O::::::Owwwwwww           wwwww           wwwwwww    eeeeeeeeeeee      D:::::D    D:::::D    ooooooooooo   nnnn  nnnnnnnn    uuuuuu    uuuuuu  ttttttt:::::ttttttt        ssssssssss   
+     Y:::::Y Y:::::Y    oo:::::::::::oo u::::u    u::::u  O:::::O     O:::::O w:::::w         w:::::w         w:::::w   ee::::::::::::ee    D:::::D     D:::::D oo:::::::::::oo n:::nn::::::::nn  u::::u    u::::u  t:::::::::::::::::t      ss::::::::::s  
+      Y:::::Y:::::Y    o:::::::::::::::ou::::u    u::::u  O:::::O     O:::::O  w:::::w       w:::::::w       w:::::w   e::::::eeeee:::::ee  D:::::D     D:::::Do:::::::::::::::on::::::::::::::nn u::::u    u::::u  t:::::::::::::::::t    ss:::::::::::::s 
+       Y:::::::::Y     o:::::ooooo:::::ou::::u    u::::u  O:::::O     O:::::O   w:::::w     w:::::::::w     w:::::w   e::::::e     e:::::e  D:::::D     D:::::Do:::::ooooo:::::onn:::::::::::::::nu::::u    u::::u  tttttt:::::::tttttt    s::::::ssss:::::s
+        Y:::::::Y      o::::o     o::::ou::::u    u::::u  O:::::O     O:::::O    w:::::w   w:::::w:::::w   w:::::w    e:::::::eeeee::::::e  D:::::D     D:::::Do::::o     o::::o  n:::::nnnn:::::nu::::u    u::::u        t:::::t           s:::::s  ssssss 
+         Y:::::Y       o::::o     o::::ou::::u    u::::u  O:::::O     O:::::O     w:::::w w:::::w w:::::w w:::::w     e:::::::::::::::::e   D:::::D     D:::::Do::::o     o::::o  n::::n    n::::nu::::u    u::::u        t:::::t             s::::::s      
+         Y:::::Y       o::::o     o::::ou::::u    u::::u  O:::::O     O:::::O      w:::::w:::::w   w:::::w:::::w      e::::::eeeeeeeeeee    D:::::D     D:::::Do::::o     o::::o  n::::n    n::::nu::::u    u::::u        t:::::t                s::::::s   
+         Y:::::Y       o::::o     o::::ou:::::uuuu:::::u  O::::::O   O::::::O       w:::::::::w     w:::::::::w       e:::::::e             D:::::D    D:::::D o::::o     o::::o  n::::n    n::::nu:::::uuuu:::::u        t:::::t    ttttttssssss   s:::::s 
+         Y:::::Y       o:::::ooooo:::::ou:::::::::::::::uuO:::::::OOO:::::::O        w:::::::w       w:::::::w        e::::::::e          DDD:::::DDDDD:::::D  o:::::ooooo:::::o  n::::n    n::::nu:::::::::::::::uu      t::::::tttt:::::ts:::::ssss::::::s
+      YYYY:::::YYYY    o:::::::::::::::o u:::::::::::::::u OO:::::::::::::OO          w:::::w         w:::::w          e::::::::eeeeeeee  D:::::::::::::::DD   o:::::::::::::::o  n::::n    n::::n u:::::::::::::::u      tt::::::::::::::ts::::::::::::::s 
+      Y:::::::::::Y     oo:::::::::::oo   uu::::::::uu:::u   OO:::::::::OO             w:::w           w:::w            ee:::::::::::::e  D::::::::::::DDD      oo:::::::::::oo   n::::n    n::::n  uu::::::::uu:::u        tt:::::::::::tt s:::::::::::ss  
+      YYYYYYYYYYYYY       ooooooooooo       uuuuuuuu  uuuu     OOOOOOOOO                www             www               eeeeeeeeeeeeee  DDDDDDDDDDDDD           ooooooooooo     nnnnnn    nnnnnn    uuuuuuuu  uuuu          ttttttttttt    sssssssssss    
+                                                                                                                                                                                                                                                                      
+                  
+        </pre>
+    </div>
+    <div class="center-container"></div>
+    <div class="bottom-container">
+        <div class="ascii-container">
+            <pre>
+ _____ _    _ _   _  ___________       _____                      ______ _     _____       _          
+| ___ \ |  | | \ | ||  ___|  _  \     | ___ \              ____  |___  /| |   /  __ \     | |         
+| |_/ / |  | |  \| || |__ | | | |     | |_/ /_   _        / __ \    / / | |   | /  \/_   _| |__   ___ 
+|  __/| |/\| | . ` ||  __|| | | |     | ___ \ | | |      / / _` |  / /  | |   | |   | | | | '_ \ / _ \
+| |   \  /\  / |\  || |___| |/ /      | |_/ / |_| |     | | (_| |./ /___| |___| \__/\ |_| | |_) |  __/
+\_|    \/  \/\_| \_/\____/|___/       \____/ \__, |      \ \__,_|\_____/\_____/\____/\__,_|_.__/ \___|
+                                              __/ |       \____/                                      
+                                             |___/                                                    
+            </pre>
+        </div>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById('canv');
+        const ctx = canvas.getContext('2d');
+
+        const w = canvas.width = document.body.offsetWidth;
+        const h = canvas.height = document.body.offsetHeight;
+        const cols = Math.floor(w / 20) + 1;
+        const ypos = Array(cols).fill(0);
+
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, w, h);
+
+        function matrix () {
+          ctx.fillStyle = '#0001';
+          ctx.fillRect(0, 0, w, h);
+        
+          ctx.fillStyle = '#0f0';
+          ctx.font = '15pt monospace';
+        
+          ypos.forEach((y, ind) => {
+            const text = String.fromCharCode(Math.random() * 128);
+            const x = ind * 20;
+            ctx.fillText(text, x, y);
+            if (y > 100 + Math.random() * 10000) ypos[ind] = 0;
+            else ypos[ind] = y + 20;
+          });
+        }
+
+        setInterval(matrix, 50);
+    </script>
+
+
+
+    <script>
+
+        const pre = document.createElement("pre");
+        document.querySelector(".center-container").appendChild(pre);
+
+                    let x=1760,
+                z=0,y=0;setInterval
+                (()=>{z+=.07,y+=.03;const
+            a=[...new Array(x)].map( (a,r
+            )=>r % 80 === 79 ?"\n":" "),r=new
+        Array(x).fill(0), t= Math.cos(z),e=
+        Math.sin(z),n=Math.cos(y), o=Math.sin
+        (y);for(let s=0;s<6.28; s+=.07){const c
+        =Math.cos(s),h=      Math.sin(s);for(let
+        s=0;s<6.28;s+=          .02){const v=Math
+        .sin(s),M=Math          .cos(s),i=c+2,l=1
+        /(v*i*e+h*t+5          ),p=v*i*t-h*e,d=0
+        |40+30*l*(M*i*n      -p*o),m=0|12+15*l*
+        (M*i*o+p*n),f=0|8*((h*e-v*c*t)*n-v*c*
+            e-h*t-M*c*o), y=d+80*m;m<22&&m>=0
+            &&d>=0&&d<79&&l>r[y] &&(r[y]=l,
+            a[y]= ".,-~:;=!*#$@"[f>0?f:0
+            ])}}pre.innerHTML=a.join
+                ("")},50); 
+
+        const funs = new Funs("light");
+        funs.signature();
+        console.log(str);
+    </script>
+</body>
+</html>
